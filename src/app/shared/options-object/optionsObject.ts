@@ -1,4 +1,3 @@
-import { CustomerDocument } from '@modules/customers/customer/schemas/customer.schema';
 import { Logger } from '@nestjs/common';
 import { HydratedDocument, Model } from 'mongoose';
 import { OptionsObjectDto } from './dtos';
@@ -62,17 +61,10 @@ export class OptionsObject<T> {
 	//TODO: Add userId to the function to filter the data based on the user
 	//NOTE: such an approach will require to standardize the name of userId field in all the schemas
 	//NOTE: it's advised not to couple the service with the user schema and to keep it generic
-	async getResult(
-		optionsObjectDto: OptionsObjectDto,
-		user?: CustomerDocument,
-	): Promise<HydratedDocument<T>[]> {
+	async getResult(optionsObjectDto: OptionsObjectDto): Promise<HydratedDocument<T>[]> {
 		const optionsObject = { ...optionsObjectDto };
 
 		const filterObject = this.createFilterObject(optionsObject.filter);
-
-		if (user) {
-			filterObject['owner'] = user;
-		}
 
 		this.logger.debug('filterObject', filterObject);
 

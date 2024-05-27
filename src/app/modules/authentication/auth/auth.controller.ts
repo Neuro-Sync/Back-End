@@ -9,7 +9,6 @@ import {
 	Param,
 	Patch,
 	Post,
-	UploadedFiles,
 	UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -17,29 +16,13 @@ import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '@shared/decorators/current-user..decorator';
 import { AuthGuard } from '@shared/guards/auth.guard';
 import { Serialize } from '@shared/interceptors/serialize.interceptor';
-import { UpdateUserPassDto } from '../../customers/customer/dtos/update-user-pass.dto';
+import { UpdateUserPassDto } from '../../patients/dtos/update-user-pass.dto';
 import { AuthService } from './auth.service';
-import {
-	GetCoachSignupDtoWithTokens,
-	GetCustomerIdDto,
-	GetCustomerSignupDtoWithTokens,
-	GetFloristSignupDtoWithTokens,
-	GetSupplierSignupDtoWithTokens,
-	LoggedInDTO,
-} from './dtos/get-user.dto';
+import { GetPatientIdDto, GetPatientSignupDtoWithTokens, LoggedInDTO } from './dtos/get-user.dto';
 import { LoginUserDto } from './dtos/login-user.dto';
-import {
-	CreateCustomerDto,
-	CreateFloweriestDto,
-	VerifyUserDto,
-	createCoachDto,
-	createSupplierDto,
-} from './dtos/signup-users.dto';
+import { CreatePatientDto, VerifyUserDto } from './dtos/signup-users.dto';
 
-import { UploadFileMultiple } from '../../../shared/decorators/file.decorator';
-import { ENUM_FILE_TYPE } from '../../../shared/media/enums';
-import { FileType } from '../../../shared/types';
-import { currentUser } from '../../../shared/types/current-user.type';
+import { currentUser } from '@shared/types/current-user.type';
 
 @Controller('auth')
 export class AuthController {
@@ -50,103 +33,22 @@ export class AuthController {
 	) {}
 
 	@ApiTags('Auth')
-	@ApiOperation({ summary: 'Customer Signup' })
+	@ApiOperation({ summary: 'Patient Signup' })
 	@ApiCreatedResponse({
-		type: GetCustomerSignupDtoWithTokens,
-		description: 'customer successfully registered.',
+		type: GetPatientSignupDtoWithTokens,
+		description: 'patient successfully registered.',
 	})
-	@Post('customer/signup')
-	@Serialize(GetCustomerSignupDtoWithTokens)
+	@Post('patient/signup')
+	@Serialize(GetPatientSignupDtoWithTokens)
 	@HttpCode(HttpStatus.CREATED)
-	async customerSignup(@Body() dto: CreateCustomerDto): Promise<object> {
+	async PatientSignup(@Body() dto: CreatePatientDto): Promise<object> {
 		return await this.authService.signup(dto);
-	}
-
-	@ApiTags('Auth')
-	@ApiOperation({ summary: 'Coach Signup' })
-	@ApiCreatedResponse({
-		type: GetCoachSignupDtoWithTokens,
-		description: 'coach successfully registered',
-	})
-	@UploadFileMultiple(
-		[
-			{ name: 'cv', maxCount: 1 },
-			{ name: 'certificates', maxCount: 4 },
-		],
-		ENUM_FILE_TYPE.PDF,
-	)
-	@Post('coach/signup')
-	@Serialize(GetCoachSignupDtoWithTokens)
-	@HttpCode(HttpStatus.CREATED)
-	async coachSignup(
-		@Body() dto: createCoachDto,
-		@UploadedFiles()
-		files: {
-			cv: FileType;
-			certificates: FileType[];
-		},
-	): Promise<object> {
-		return await this.authService.signup(dto, files);
-	}
-
-	@ApiTags('Auth')
-	@ApiOperation({ summary: 'Supplier Signup' })
-	@ApiCreatedResponse({
-		type: GetSupplierSignupDtoWithTokens,
-		description: 'supplier successfully registered',
-	})
-	@UploadFileMultiple(
-		[
-			{ name: 'taxCard', maxCount: 1 },
-			{ name: 'commercialRegister', maxCount: 1 },
-		],
-		ENUM_FILE_TYPE.PDF,
-	)
-	@Post('supplier/signup')
-	@Serialize(GetSupplierSignupDtoWithTokens)
-	@HttpCode(HttpStatus.CREATED)
-	async supplierSignup(
-		@Body() dto: createSupplierDto,
-		@UploadedFiles()
-		files: {
-			taxCard: FileType;
-			commercialRegister: FileType;
-		},
-	): Promise<object> {
-		return await this.authService.signup(dto, files);
-	}
-
-	@ApiTags('Auth')
-	@ApiOperation({ summary: 'Florist Signup' })
-	@ApiCreatedResponse({
-		type: GetFloristSignupDtoWithTokens,
-		description: 'Florist successfully registered',
-	})
-	@UploadFileMultiple(
-		[
-			{ name: 'cv', maxCount: 1 },
-			{ name: 'certificates', maxCount: 4 },
-		],
-		ENUM_FILE_TYPE.PDF,
-	)
-	@Post('florist/signup')
-	@Serialize(GetFloristSignupDtoWithTokens)
-	@HttpCode(HttpStatus.CREATED)
-	async floristSignup(
-		@Body() dto: CreateFloweriestDto,
-		@UploadedFiles()
-		files: {
-			cv: FileType;
-			certificates: FileType[];
-		},
-	): Promise<object> {
-		return await this.authService.signup(dto, files);
 	}
 
 	@ApiTags('Auth')
 	@ApiOperation({ summary: 'Verify Account' })
 	@ApiCreatedResponse({ description: 'account successfully verified' })
-	@Patch('customer/:id')
+	@Patch('Patient/:id')
 	@HttpCode(HttpStatus.OK)
 	async verifyUser(@Body() dto: VerifyUserDto, @Param('id') id: string): Promise<object> {
 		return await this.authService.verifyUser(dto, id);
@@ -174,17 +76,17 @@ export class AuthController {
 
 	@ApiTags('Password')
 	@ApiOperation({ summary: 'Get User Id' })
-	@ApiCreatedResponse({ type: GetCustomerIdDto, description: 'user id retrieved successfully' })
-	@Get('customer/public/:email')
-	@Serialize(GetCustomerIdDto)
-	async getCustomer(@Param('email') email: string): Promise<object> {
-		return await this.authService.getCustomerId(email);
+	@ApiCreatedResponse({ type: GetPatientIdDto, description: 'user id retrieved successfully' })
+	@Get('Patient/public/:email')
+	@Serialize(GetPatientIdDto)
+	async getPatient(@Param('email') email: string): Promise<object> {
+		return await this.authService.getPatientId(email);
 	}
 
 	@ApiTags('Password')
 	@ApiOperation({ summary: 'Reset Password' })
 	@ApiCreatedResponse({ description: 'password reset successfully' })
-	@Patch('customer/public/:resetToken')
+	@Patch('Patient/public/:resetToken')
 	async resetPassword(
 		@Param('resetToken') resetToken: string,
 		@Body() { password }: UpdateUserPassDto,
