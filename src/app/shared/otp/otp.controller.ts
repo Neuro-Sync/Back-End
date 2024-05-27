@@ -1,10 +1,10 @@
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Serialize } from '../../../shared/interceptors/serialize.interceptor';
 import { BadRequestException, Body, Controller, Param, Post } from '@nestjs/common';
-import { createOTPDto, verifyOTPDto } from './dtos/otp.dto';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Serialize } from '@shared/interceptors/serialize.interceptor';
 import { GetTokenDto } from '../token/dtos/get-token.dto';
-import { TokenService } from '../token/token.service';
 import { TokenTypes } from '../token/enums';
+import { TokenService } from '../token/token.service';
+import { createOTPDto, verifyOTPDto } from './dtos/otp.dto';
 import { OtpService } from './otp.service';
 
 @ApiTags('Password')
