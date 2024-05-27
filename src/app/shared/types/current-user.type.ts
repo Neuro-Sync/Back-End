@@ -1,3 +1,3 @@
-import { CustomerDocument } from '../../modules/customers/customer/schemas/customer.schema';
+import { PatientDocument } from '@modules/patients/patient/schema/patient.schema';
 
-export type currentUser = CustomerDocument & { session: string };
+export type currentUser = PatientDocument & { session: string };
