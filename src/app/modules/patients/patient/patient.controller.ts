@@ -1,5 +1,6 @@
-import { Logger } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 
+@Controller('patients')
 export class PatientController {
 	private logger = new Logger(PatientController.name);
 	constructor() {}
