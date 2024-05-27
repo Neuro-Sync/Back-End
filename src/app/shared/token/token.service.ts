@@ -1,11 +1,11 @@
+import { AuthSessionService } from '@modules/authentication/auth-session/auth-session.service';
+import { PatientService } from '@modules/patients/patient/patient.service';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import * as crypto from 'crypto';
 import * as _ from 'lodash';
 import { Model } from 'mongoose';
-import { AuthSessionService } from '../../authentication/auth-session/auth-session.service';
-import { CustomerService } from '../customer/customer.service';
 import { TokenTypes } from './enums';
 import { Token, TokenDocument } from './schemas/token.schema';
 
@@ -14,7 +14,7 @@ export class TokenService {
 	constructor(
 		@InjectModel(Token.name) private TokenModel: Model<Token>,
 		private readonly jwtService: JwtService,
-		private readonly customerService: CustomerService,
+		private readonly patientService: PatientService,
 		private readonly authSessionService: AuthSessionService,
 	) {}
 
@@ -90,12 +90,12 @@ export class TokenService {
 		const session = await this.authSessionService.findSessionById(_.get(decoded, 'session'));
 		if (!session || session.status == 'inactive' || session.status == 'expired') return false;
 
-		const [customer] = await this.customerService.findCustomers({ id: session.user });
-		if (!customer) return false;
+		const [patient] = await this.patientService.findPatients({ id: session.user });
+		if (!patient) return false;
 
 		const accessToken = this.signJWT(
 			{
-				...customer.toJSON(),
+				...patient.toJSON(),
 				session: session._id,
 			},
 			'access',
