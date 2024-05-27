@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
-import { ImageModule } from '../../../shared/media/media.module';
-import { CustomerModule } from '../../customers/customer/customer.module';
-import { MailerModule } from '../../customers/mailer/mailer.module';
-import { OtpModule } from '../../customers/otp/otp.module';
-import { TokenModule } from '../../customers/token/token.module';
+import { MailerModule } from '@shared/mailer/mailer.module';
+import { ImageModule } from '@shared/media/media.module';
+import { OtpModule } from '@shared/otp/otp.module';
+import { TokenModule } from '@shared/token/token.module';
+import { PatientModule } from '../../patients/patient/patient.module';
 import { AuthSessionModule } from '../auth-session/auth-session.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
 @Module({
-	imports: [CustomerModule, TokenModule, AuthSessionModule, OtpModule, MailerModule, ImageModule],
+	imports: [PatientModule, TokenModule, AuthSessionModule, OtpModule, MailerModule, ImageModule],
 	providers: [AuthService],
 	controllers: [AuthController],
 })
