@@ -1,7 +1,8 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import Configs from './app/shared/config';
+import Configs from '@shared/config';
+import { userDeserializationMiddleware } from '@shared/middlewares/user-deserialization.middleware';
 
 @Module({
 	imports: [
@@ -9,7 +10,7 @@ import Configs from './app/shared/config';
 			inject: [ConfigService],
 			useFactory: (configService: ConfigService) => {
 				return {
-					uri: configService.get('database.local_url'),
+					uri: configService.get('database.url'),
 					dbName: configService.get('database.name'),
 					authSource: 'admin',
 					connectionFactory: (connection): void => {
