@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotAcceptableException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CloudConvertService } from '@shared/cloud-convert/cloud-convert.service';
+// import { CloudConvertService } from '@shared/cloud-convert/cloud-convert.service';
 import { Model } from 'mongoose';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { FileType } from '../types';
@@ -12,7 +12,7 @@ export class XlsxService {
 	constructor(
 		@InjectModel(Xlsx.name) private xlsxModel: Model<Xlsx>,
 		private cloudinaryService: CloudinaryService,
-		private cloudConvertService: CloudConvertService,
+		// private cloudConvertService: CloudConvertService,
 	) {}
 
 	private validateXlsx(file: FileType): void {
@@ -43,7 +43,7 @@ export class XlsxService {
 		return await this.xlsxModel.findByIdAndDelete(xlsxId);
 	}
 
-	async downloadXlsxTemplate(cloudinayId: string) {
-		return await this.cloudConvertService.convertFile(cloudinayId);
-	}
+	// async downloadXlsxTemplate(cloudinayId: string) {
+	// 	return await this.cloudConvertService.convertFile(cloudinayId);
+	// }
 }
