@@ -1,15 +1,11 @@
-import { OtpTypes } from '../otp/enums';
-import * as nodemailer from 'nodemailer';
+import { PatientService } from '@modules/patients/patient/patient.service';
 import { Injectable } from '@nestjs/common';
-import { sendEmailDto } from './interfaces/mail.interface';
-import { CustomerService } from '../customer/customer.service';
-import { text } from 'stream/consumers';
-import { Subject } from 'rxjs';
+import * as nodemailer from 'nodemailer';
 import { mailTypes } from './enums';
 
 @Injectable()
 export class MailerService {
-	constructor(private readonly customerService: CustomerService) {}
+	constructor(private readonly patientService: PatientService) {}
 
 	mailTransporter() {
 		const Transporter = nodemailer.createTransport({
@@ -46,15 +42,15 @@ export class MailerService {
 	};
 
 	// FIXME replace OTP with interface that represent data and based on it check what we need to replace
-	async sendEmail(customerId: string, Otp: string, mailType: mailTypes) {
-		const [customer] = await this.customerService.findCustomers({ id: customerId });
+	async sendEmail(patientId: string, Otp: string, mailType: mailTypes) {
+		const [patient] = await this.patientService.findPatients({ id: patientId });
 		const format = this.mailFormats[mailType];
 
 		const textWithOTP = format.text.replace('{{OTP}}', Otp);
 
 		const mailOptions = {
 			from: process.env.MAILER_EMAIL,
-			to: customer.email,
+			to: patient.email,
 			subject: format.subject,
 			text: textWithOTP,
 		};
