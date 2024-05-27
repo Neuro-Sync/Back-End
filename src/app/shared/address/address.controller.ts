@@ -1,4 +1,4 @@
-import { CustomerDocument } from '@modules/customers/customer/schemas/customer.schema';
+import { PatientDocument } from '@modules/patients/patient/schema/patient.schema';
 import {
 	Body,
 	Controller,
@@ -30,7 +30,7 @@ export class AddressController {
 	@Post()
 	@ApiOperation({ summary: 'create address' })
 	async createAddress(
-		@CurrentUser() user: CustomerDocument,
+		@CurrentUser() user: PatientDocument,
 		@Body() createAddressDto: CreateAddressDto,
 	): Promise<AddressDocument> {
 		return await this.addressService.createAddress(createAddressDto, user.id);
@@ -39,7 +39,7 @@ export class AddressController {
 	@Post('geo')
 	@ApiOperation({ summary: 'create geo address' })
 	async createGeoAddress(
-		@CurrentUser() user: CustomerDocument,
+		@CurrentUser() user: PatientDocument,
 		@Body() createGeoAddressDto: CreateGeoAddressDto,
 	): Promise<AddressDocument> {
 		return await this.addressService.createGeoAddress(createGeoAddressDto, user.id);
@@ -48,7 +48,7 @@ export class AddressController {
 	@Get()
 	@ApiOperation({ summary: 'get addresses' })
 	async getAddresses(
-		@CurrentUser() user: CustomerDocument,
+		@CurrentUser() user: PatientDocument,
 		@Query() query: OptionsObjectDto,
 	): Promise<AddressDocument[]> {
 		return await this.addressService.getAddresses(query, user);
@@ -57,7 +57,7 @@ export class AddressController {
 	@Get('/:addressId')
 	@ApiOperation({ summary: 'get address by id' })
 	async getAddress(
-		@CurrentUser() user: CustomerDocument,
+		@CurrentUser() user: PatientDocument,
 		@Param('addressId') addressId: string,
 	): Promise<AddressDocument> {
 		this.logger.debug(`addressId:${addressId},userId: ${user.id}`);
@@ -76,7 +76,7 @@ export class AddressController {
 	@Delete('/:addressId')
 	@ApiOperation({ summary: 'delete address' })
 	async deleteAddress(
-		@CurrentUser() user: CustomerDocument,
+		@CurrentUser() user: PatientDocument,
 		@Param('addressId') addressId: string,
 	): Promise<AddressDocument> {
 		return await this.addressService.deleteAddress(addressId, user.id);

@@ -1,4 +1,4 @@
-import { CustomerDocument } from '@modules/customers/customer/schemas/customer.schema';
+import { PatientDocument } from '@modules/patients/patient/schema/patient.schema';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { OptionsObjectDto } from '@shared/options-object/dtos';
@@ -15,7 +15,7 @@ export class AddressService {
 
 	async getAddresses(
 		optionsObjectDto: OptionsObjectDto,
-		user: CustomerDocument,
+		user: PatientDocument,
 	): Promise<AddressDocument[]> {
 		optionsObjectDto.filter.concat(`,owner=${user.id}`);
 		const addresses = await new OptionsObject<Address>(this.addressModel).getResult(
