@@ -1,11 +1,11 @@
-import { MailerService } from '../mailer/mailer.service';
-import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
-import { Otp } from './schemas/otp.schema';
-import { OtpTypes } from './enums';
-import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
+import { Model } from 'mongoose';
 import { mailTypes } from '../mailer/enums';
+import { MailerService } from '../mailer/mailer.service';
+import { OtpTypes } from './enums';
+import { Otp } from './schemas/otp.schema';
 @Injectable()
 export class OtpService {
 	constructor(
@@ -45,10 +45,10 @@ export class OtpService {
 		return true;
 	}
 
-	async createAndSendOtp(customerId: string, OtpType: OtpTypes) {
-		const Otp = await this.createOtp(customerId, OtpType);
+	async createAndSendOtp(userId: string, OtpType: OtpTypes): Promise<void> {
+		const Otp = await this.createOtp(userId, OtpType);
 		const mailType =
 			OtpType === OtpTypes.Verify_Account ? mailTypes.Verify_Account : mailTypes.Reset_Password;
-		return await this.mailerServer.sendEmail(customerId, Otp, mailType);
+		await this.mailerServer.sendEmail(userId, Otp, mailType);
 	}
 }

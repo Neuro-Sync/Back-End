@@ -42,7 +42,7 @@ export class MailerService {
 	};
 
 	// FIXME replace OTP with interface that represent data and based on it check what we need to replace
-	async sendEmail(patientId: string, Otp: string, mailType: mailTypes) {
+	async sendEmail(patientId: string, Otp: string, mailType: mailTypes): Promise<void> {
 		const [patient] = await this.patientService.findPatients({ id: patientId });
 		const format = this.mailFormats[mailType];
 
