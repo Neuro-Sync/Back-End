@@ -14,11 +14,11 @@ export class PaymentRepository implements IRepository<Payment> {
 		return await this.paymentModel.create({ ...paymentData });
 	}
 
-	async findById(paymentId: string): Promise<Payment> {
+	async findById(paymentId: string): Promise<PaymentDocument> {
 		return this.paymentModel.findById(paymentId).exec();
 	}
 
-	async findOne(query: any): Promise<PaymentDocument> {
+	async findOne(query: unknown): Promise<PaymentDocument> {
 		return this.paymentModel.findOne(query).exec();
 	}
 
