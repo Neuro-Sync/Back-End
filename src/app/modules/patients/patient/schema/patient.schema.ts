@@ -1,6 +1,6 @@
-import { Gender, Role } from '@modules/patients/enums';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AddressDocument } from '@shared/address/schemas/address.schema';
+import { Gender } from '@shared/enums';
 import { ImageDocument } from '@shared/media/schemas/image.schema';
 import { scrypt as _scrypt, randomBytes } from 'crypto';
 import * as mongoose from 'mongoose';
@@ -28,9 +28,6 @@ export class Patient {
 
 	@Prop({ type: String, required: true })
 	password: string;
-
-	@Prop({ type: String, required: true, enum: Object.values(Role) })
-	role: Role;
 
 	@Prop({ type: Boolean, default: false })
 	isVerified?: boolean;
