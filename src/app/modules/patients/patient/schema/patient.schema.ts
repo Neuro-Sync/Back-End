@@ -3,12 +3,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AddressDocument } from '@shared/address/schemas/address.schema';
 import { Gender } from '@shared/enums';
 import { ImageDocument } from '@shared/media/schemas/image.schema';
-import { scrypt as _scrypt } from 'crypto';
 import * as mongoose from 'mongoose';
 import { HydratedDocument } from 'mongoose';
-import { promisify } from 'util';
-
-const scrypt = promisify(_scrypt);
 
 export type PatientDocument = HydratedDocument<Patient>;
 
@@ -24,7 +20,7 @@ export class Patient {
 	@Prop({ type: String, required: true, unique: true })
 	email: string;
 
-	@Prop({ type: String, required: true, unique: true })
+	@Prop({ type: String, unique: true })
 	phone?: string;
 
 	@Prop({ type: Boolean, default: false })
@@ -67,6 +63,9 @@ export class Patient {
 		ref: 'Companion',
 	})
 	companion?: CompanionDocument;
+
+	@Prop({ type: String, default: 'patient' })
+	role?: string;
 }
 
 export const PatientSchema = SchemaFactory.createForClass(Patient);

@@ -7,6 +7,7 @@ import {
 	HttpCode,
 	HttpStatus,
 	Logger,
+	Param,
 	Patch,
 	Post,
 	Req,
@@ -16,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '@shared/decorators';
 import { AuthGuard } from '@shared/guards/auth.guard';
+import { PatientGuard } from '@shared/guards/patient.guard';
 import { AuthService } from './auth.service';
 import { CompanionSignupDto, LoginUserDto, PatientOnboardingDto } from './dtos';
 
@@ -50,7 +52,7 @@ export class AuthController {
 	}
 
 	@UseGuards(AuthGuard)
-	@Get('patient-link')
+	@Get('patient-link/:hash')
 	@HttpCode(HttpStatus.CREATED)
 	@ApiTags('Auth')
 	@ApiOperation({ summary: 'Companion Linkage' })
@@ -59,17 +61,15 @@ export class AuthController {
 	})
 	async companionLinkage(
 		@Req() req: Request,
+		@Param('hash') hash: string,
 		@CurrentUser() companion: CompanionDocument,
 	): Promise<unknown> {
-		const { url } = req;
-		this.logger.debug(`url: ${url}`);
-
-		const hash = url.split('/patient-link/').pop();
 		return await this.authService.companionLinkage(companion, hash);
 	}
 
 	//!: The link returned will be converted to a QR code in the client side (Mobile App)
 	@UseGuards(AuthGuard)
+	@UseGuards(PatientGuard)
 	@Patch('patient-link')
 	@HttpCode(HttpStatus.CREATED)
 	@ApiTags('Auth')

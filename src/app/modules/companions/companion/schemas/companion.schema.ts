@@ -74,6 +74,9 @@ export class Companion {
 		ref: 'Patient',
 	})
 	patient: PatientDocument;
+
+	@Prop({ type: String, default: 'companion' })
+	role?: string;
 }
 
 export const CompanionSchema = SchemaFactory.createForClass(Companion);

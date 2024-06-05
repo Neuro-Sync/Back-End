@@ -152,9 +152,9 @@ export class AuthService {
 	async companionLinkage(companion: CompanionDocument, hash: string): Promise<{ message: string }> {
 		this.logger.debug(hash);
 		const decipher = crypto.createDecipheriv(
-			'sha256',
-			this.config.get<string>('app.linkageSecret'),
-			this.config.get<string>('app.linkageInitVector'),
+			'aes-256-gcm',
+			Buffer.from(this.config.get<string>('app.linkageSecret').slice(0, 32), 'binary'),
+			Buffer.from(this.config.get<string>('app.linkageInitVector').slice(0, 16), 'binary'),
 		);
 		const patientId = decipher.update(hash, 'hex', 'utf8');
 
@@ -172,9 +172,9 @@ export class AuthService {
 
 	async patientLinkage(patient: PatientDocument): Promise<PatientLinkageDto> {
 		const cipher = crypto.createCipheriv(
-			'sha256',
-			this.config.get<string>('app.linkageSecret'),
-			this.config.get<string>('app.linkageInitVector'),
+			'aes-256-gcm',
+			Buffer.from(this.config.get<string>('app.linkageSecret').slice(0, 32), 'binary'),
+			Buffer.from(this.config.get<string>('app.linkageInitVector').slice(0, 16), 'binary'),
 		);
 		const hash = cipher.update(patient.id, 'utf8', 'hex');
 		this.logger.debug(hash);
@@ -184,13 +184,44 @@ export class AuthService {
 	}
 
 	async patientOnboarding(patientOnboardingDto: PatientOnboardingDto): Promise<unknown> {
-		await this.patientRepository.create({ ...patientOnboardingDto });
+		let patient: PatientDocument;
+		try {
+			patient = await this.patientRepository.create({ ...patientOnboardingDto });
+		} catch (error) {
+			switch (error.code) {
+				case 11000:
+					throw new BadRequestException('email in use');
+				default:
+					break;
+			}
+			throw new BadRequestException(error.message);
+		}
+
 		this.otpService.createAndSendOtp(
 			patientOnboardingDto.email,
 			OtpTypes.Verify_Account,
 			UserType.PATIENT,
 		);
-		return { message: 'patient onboarding done successfully' };
+
+		const session = await this.authSessionService.createSession({
+			user: patient.id,
+			expiresAt: new Date(
+				Date.now() + parseInt(process.env.SESSION_EXPIRY_IN_DAY) * 24 * 60 * 60 * 1000,
+			),
+			status: AuthSessionStatus.ACTIVE,
+		});
+
+		const accessToken = await this.tokenService.signJWT(
+			{ ...patient.toJSON(), session: session.id },
+			'access',
+		);
+
+		const refreshToken = await this.tokenService.signJWT(
+			{ ...patient.toJSON(), session: session.id },
+			'refresh',
+		);
+
+		return { patient, accessToken, refreshToken };
 	}
 
 	// async login(email: string, password: string): Promise<object> {
