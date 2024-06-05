@@ -9,16 +9,17 @@ import { promisify } from 'util';
 
 const scrypt = promisify(_scrypt);
 
-export type PatientDocument = HydratedDocument<Patient>;
+export type CompanionDocument = HydratedDocument<Companion>;
 
 @Schema({
 	timestamps: true,
 	versionKey: false,
+	virtuals: true,
 	toJSON: { virtuals: true },
 })
-export class Patient {
+export class Companion {
 	@Prop({ type: String, required: true })
-	fullName: string;
+	name: string;
 
 	@Prop({ type: String, required: true, unique: true })
 	email: string;
@@ -37,6 +38,9 @@ export class Patient {
 
 	@Prop({ type: Boolean, default: true })
 	isActive?: boolean;
+
+	@Prop({ type: Boolean, default: false })
+	isConnected?: boolean;
 
 	@Prop({ type: Date })
 	passwordChangedAt?: Date;
@@ -60,11 +64,17 @@ export class Patient {
 
 	@Prop({ type: String, enum: Object.values(Gender) })
 	gender?: Gender;
+
+	async comparePassword(candidatePassword: string): Promise<boolean> {
+		const [storedHash, salt] = this.password.split('.');
+		const hash = (await scrypt(candidatePassword, salt, 32)) as Buffer;
+		if (storedHash !== hash.toString('hex')) return false;
+	}
 }
 
-export const PatientSchema = SchemaFactory.createForClass(Patient);
+export const CompanionSchema = SchemaFactory.createForClass(Companion);
 
-PatientSchema.pre('save', async function (next) {
+CompanionSchema.pre('save', async function (next) {
 	if (!this.isModified('password')) return next();
 	const salt = randomBytes(8).toString('hex');
 	const hash = (await scrypt(this.password, salt, 32)) as Buffer;

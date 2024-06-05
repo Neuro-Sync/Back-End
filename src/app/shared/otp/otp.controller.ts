@@ -1,10 +1,12 @@
 import { BadRequestException, Body, Controller, Param, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UserType } from '@shared/enums';
 import { Serialize } from '@shared/interceptors/serialize.interceptor';
 import { GetTokenDto } from '../token/dtos/get-token.dto';
 import { TokenTypes } from '../token/enums';
 import { TokenService } from '../token/token.service';
-import { createOTPDto, verifyOTPDto } from './dtos/otp.dto';
+import { verifyOTPDto } from './dtos/otp.dto';
+import { OtpTypes } from './enums';
 import { OtpService } from './otp.service';
 
 @ApiTags('Password')
@@ -18,8 +20,12 @@ export class OtpController {
 	@ApiOperation({ summary: 'Send OTP' })
 	@ApiCreatedResponse({ description: 'OTP created successfully' })
 	@Post()
-	async createAndSendOtp(@Body() { userId, OtpType }: createOTPDto): Promise<object> {
-		await this.otpService.createAndSendOtp(userId, OtpType);
+	async createAndSendOtp(@Body() body: { userId: string }): Promise<object> {
+		await this.otpService.createAndSendOtp(
+			body.userId,
+			OtpTypes.Verify_Account,
+			UserType.COMPANION,
+		);
 		return { message: 'OTP created successfully' };
 	}
 

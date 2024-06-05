@@ -1,11 +1,12 @@
-import { MailerService } from '../mailer/mailer.service';
-import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
-import { Otp } from './schemas/otp.schema';
-import { OtpTypes } from './enums';
-import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { UserType } from '@shared/enums';
 import * as bcrypt from 'bcrypt';
+import { Model } from 'mongoose';
 import { mailTypes } from '../mailer/enums';
+import { MailerService } from '../mailer/mailer.service';
+import { OtpTypes } from './enums';
+import { Otp } from './schemas/otp.schema';
 @Injectable()
 export class OtpService {
 	constructor(
@@ -13,9 +14,9 @@ export class OtpService {
 		private readonly mailerServer: MailerService,
 	) {}
 
-	async createOtp(customerId: string, OtpType: OtpTypes): Promise<string> {
+	private async createOtp(userId: string, OtpType: OtpTypes): Promise<string> {
 		const storedOtp = await this.OtpModel.findOne({
-			customer: customerId,
+			owner: userId,
 		});
 		if (storedOtp) await this.OtpModel.findByIdAndDelete(storedOtp.id);
 
@@ -23,15 +24,15 @@ export class OtpService {
 		const salt = await bcrypt.genSalt(10);
 		const hashedOTP = await bcrypt.hash(Otp.toString(), salt);
 
-		const OTPDocument = new this.OtpModel({ customer: customerId, otp: hashedOTP, OtpType });
+		const OTPDocument = new this.OtpModel({ owner: userId, otp: hashedOTP, OtpType });
 		await OTPDocument.save();
 
 		return Otp.toString();
 	}
 
-	async verifyOTP(customerId: string, OTP: string, OtpType: OtpTypes): Promise<boolean> {
+	async verifyOTP(userId: string, OTP: string, OtpType: OtpTypes): Promise<boolean> {
 		const storedOtp = await this.OtpModel.findOne({
-			customer: customerId,
+			owner: userId,
 			OtpType: OtpType,
 			expiresAt: { $gt: new Date(Date.now()) },
 		});
@@ -45,10 +46,10 @@ export class OtpService {
 		return true;
 	}
 
-	async createAndSendOtp(customerId: string, OtpType: OtpTypes) {
-		const Otp = await this.createOtp(customerId, OtpType);
+	async createAndSendOtp(userId: string, OtpType: OtpTypes, userType: UserType): Promise<void> {
+		const Otp = await this.createOtp(userId, OtpType);
 		const mailType =
 			OtpType === OtpTypes.Verify_Account ? mailTypes.Verify_Account : mailTypes.Reset_Password;
-		return await this.mailerServer.sendEmail(customerId, Otp, mailType);
+		await this.mailerServer.sendEmail(userId, Otp, mailType, userType);
 	}
 }

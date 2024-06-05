@@ -1,3 +1,4 @@
+import { AuthModule } from '@modules/authentication/auth/auth.module';
 import { PatientModule } from '@modules/patients/patient/patient.module';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -37,6 +38,7 @@ import { TokenModule } from '@shared/token/token.module';
 			ignoreEnvFile: false,
 			envFilePath: `.env.development`,
 		}),
+		AuthModule,
 		TokenModule,
 		PatientModule,
 		PaymentModule,

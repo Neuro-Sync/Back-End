@@ -14,8 +14,8 @@ export class Otp {
 	@Prop({ required: true })
 	otp: string;
 
-	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Customer', required: true })
-	customer: string;
+	@Prop({ type: mongoose.Schema.Types.ObjectId, required: true })
+	owner: string;
 
 	@Prop({ enum: Object.values(OtpTypes), required: true })
 	OtpType: string;

@@ -19,8 +19,8 @@ async function bootstrap(): Promise<void> {
 	);
 
 	const config = new DocumentBuilder()
-		.setTitle('Kazle Docs')
-		.setDescription('The Kazle API description')
+		.setTitle('NeuroSync Docs')
+		.setDescription('The NeuroSync API description')
 		.setVersion('1.0')
 		.build();
 	const document = SwaggerModule.createDocument(app, config);
