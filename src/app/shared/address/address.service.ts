@@ -1,16 +1,17 @@
+import { CompanionDocument } from '@modules/companions/companion/schemas';
 import { PatientDocument } from '@modules/patients/patient/schema/patient.schema';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { OptionsObjectDto } from '@shared/options-object/dtos';
 import { OptionsObject } from '@shared/options-object/optionsObject';
 import { Model } from 'mongoose';
-import { CreateAddressDto } from './dtos/create-address.dto';
-import { CreateGeoAddressDto } from './dtos/create-geo-address.dto';
+import { CreateGeoAddressDto } from './dtos';
 import { AddressType } from './enums';
 import { Address, AddressDocument } from './schemas/address.schema';
 
 @Injectable()
 export class AddressService {
+	private logger = new Logger(AddressService.name);
 	constructor(@InjectModel(Address.name) private addressModel: Model<Address>) {}
 
 	async getAddresses(
@@ -33,21 +34,42 @@ export class AddressService {
 		createGeoAddressDto: CreateGeoAddressDto,
 		userId: string,
 	): Promise<AddressDocument> {
+		const { latitude, longitude, addressType } = createGeoAddressDto;
 		return this.addressModel.create({
-			addressType: AddressType.COORDINATE,
-			...createGeoAddressDto,
+			latitude,
+			longitude,
+			addressType: addressType ?? AddressType.OTHER,
 			owner: userId,
 		});
 	}
 
-	async createAddress(
-		createAddressDto: CreateAddressDto,
+	async updateCurrentGeoAddress(
+		createGeoAddressDto: CreateGeoAddressDto,
 		userId: string,
 	): Promise<AddressDocument> {
-		return this.addressModel.create({
-			addressType: AddressType.ADDRESS,
-			...createAddressDto,
-			owner: userId,
+		const { latitude, longitude } = createGeoAddressDto;
+		return (
+			(await this.addressModel.findOneAndUpdate(
+				{ addressType: AddressType.CURRENT, owner: userId },
+				{
+					latitude,
+					longitude,
+				},
+				{ new: true },
+			)) ??
+			(await this.addressModel.create({
+				latitude,
+				longitude,
+				addressType: AddressType.CURRENT,
+				owner: userId,
+			}))
+		);
+	}
+
+	async getPatientCurrentLocation(companion: CompanionDocument): Promise<AddressDocument> {
+		return await this.addressModel.findOne({
+			addressType: AddressType.CURRENT,
+			owner: companion.patient.id,
 		});
 	}
 

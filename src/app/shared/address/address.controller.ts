@@ -1,3 +1,4 @@
+import { CompanionDocument } from '@modules/companions/companion/schemas';
 import { PatientDocument } from '@modules/patients/patient/schema/patient.schema';
 import {
 	Body,
@@ -16,33 +17,59 @@ import { CurrentUser } from '@shared/decorators/current-user.decorator';
 import { AuthGuard } from '@shared/guards/auth.guard';
 import { OptionsObjectDto } from '@shared/options-object/dtos';
 import { AddressService } from './address.service';
-import { CreateAddressDto } from './dtos/create-address.dto';
-import { CreateGeoAddressDto } from './dtos/create-geo-address.dto';
+import { CreateGeoAddressDto } from './dtos';
+import { AddressType } from './enums';
 import { AddressDocument } from './schemas/address.schema';
 
-@Controller('addresses')
-@ApiTags('Address')
+@Controller('map')
+@ApiTags('maps')
 @UseGuards(AuthGuard)
 export class AddressController {
 	private logger = new Logger(AddressController.name);
 	constructor(private addressService: AddressService) {}
 
-	@Post()
-	@ApiOperation({ summary: 'create address' })
-	async createAddress(
-		@CurrentUser() user: PatientDocument,
-		@Body() createAddressDto: CreateAddressDto,
-	): Promise<AddressDocument> {
-		return await this.addressService.createAddress(createAddressDto, user.id);
-	}
-
-	@Post('geo')
+	@Post('/patient')
 	@ApiOperation({ summary: 'create geo address' })
 	async createGeoAddress(
-		@CurrentUser() user: PatientDocument,
+		@CurrentUser() patient: PatientDocument,
 		@Body() createGeoAddressDto: CreateGeoAddressDto,
 	): Promise<AddressDocument> {
-		return await this.addressService.createGeoAddress(createGeoAddressDto, user.id);
+		return await this.addressService.createGeoAddress(createGeoAddressDto, patient.id);
+	}
+	@Post('/patient/pin')
+	@ApiOperation({ summary: 'create geo address' })
+	async createPin(
+		@CurrentUser() patient: PatientDocument,
+		@Body() createGeoAddressDto: CreateGeoAddressDto,
+	): Promise<AddressDocument> {
+		createGeoAddressDto.addressType = AddressType.PIN;
+		return await this.addressService.createGeoAddress(createGeoAddressDto, patient.id);
+	}
+	@Post('/patient/favorite')
+	@ApiOperation({ summary: 'create geo address' })
+	async createFavorite(
+		@CurrentUser() patient: PatientDocument,
+		@Body() createGeoAddressDto: CreateGeoAddressDto,
+	): Promise<AddressDocument> {
+		createGeoAddressDto.addressType = AddressType.FAVORITE;
+		return await this.addressService.createGeoAddress(createGeoAddressDto, patient.id);
+	}
+
+	@Patch('/patient/current-location')
+	@ApiOperation({ summary: 'create geo address' })
+	async createCurrentGeoAddress(
+		@CurrentUser() patient: PatientDocument,
+		@Body() createGeoAddressDto: CreateGeoAddressDto,
+	): Promise<AddressDocument> {
+		return await this.addressService.updateCurrentGeoAddress(createGeoAddressDto, patient.id);
+	}
+
+	@Get('/companion/patient-current-location')
+	@ApiOperation({ summary: "get patient current geos' " })
+	async getPatientCurrentLocation(
+		@CurrentUser() companion: CompanionDocument,
+	): Promise<AddressDocument> {
+		return await this.addressService.getPatientCurrentLocation(companion);
 	}
 
 	@Get()
@@ -68,9 +95,9 @@ export class AddressController {
 	@ApiOperation({ summary: 'update address' })
 	async updateAddress(
 		@Param('addressId') addressId: string,
-		@Body() createAddressDto: CreateAddressDto,
+		@Body() createGeoAddressDto: CreateGeoAddressDto,
 	): Promise<AddressDocument> {
-		return await this.addressService.updateAddress(addressId, createAddressDto);
+		return await this.addressService.updateAddress(addressId, createGeoAddressDto);
 	}
 
 	@Delete('/:addressId')

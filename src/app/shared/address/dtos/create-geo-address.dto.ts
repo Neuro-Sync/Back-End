@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsLatitude, IsLongitude } from 'class-validator';
+import { IsEnum, IsLatitude, IsLongitude, IsOptional } from 'class-validator';
+import { AddressType } from '../enums';
 
 export class CreateGeoAddressDto {
 	@ApiProperty({
@@ -15,4 +16,12 @@ export class CreateGeoAddressDto {
 	})
 	@IsLongitude({ message: 'Longitude must be a valid longitude' })
 	longitude: string;
+
+	@IsOptional()
+	@ApiProperty({
+		type: String,
+		example: 'home',
+	})
+	@IsEnum(Object.values(AddressType), { message: 'Invalid address type' })
+	addressType: string;
 }
