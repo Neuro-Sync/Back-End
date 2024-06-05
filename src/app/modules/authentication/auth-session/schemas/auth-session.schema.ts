@@ -1,7 +1,8 @@
+import { CompanionDocument } from '@modules/companions/companion/schemas';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { HydratedDocument } from 'mongoose';
 import { AuthSessionStatus } from '../enums';
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type AuthSessionDocument = HydratedDocument<AuthSession>;
 
@@ -10,8 +11,8 @@ export type AuthSessionDocument = HydratedDocument<AuthSession>;
 	versionKey: false,
 })
 export class AuthSession {
-	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Customer', required: true })
-	user: string;
+	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Companion', required: true })
+	user: CompanionDocument;
 
 	@Prop({ type: Date, required: true })
 	expiresAt: Date;
@@ -22,7 +23,7 @@ export class AuthSession {
 
 	//FIXME we still need to understand difference between valid and active  & make it required
 	@Prop({ type: String, enum: Object.values(AuthSessionStatus) })
-	status: string;
+	status?: string;
 }
 
 export const AuthSessionSchema = SchemaFactory.createForClass(AuthSession);

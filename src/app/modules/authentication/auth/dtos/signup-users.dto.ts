@@ -1,6 +1,6 @@
-import { Gender } from '@modules/patients/enums';
 import { ApiProperty } from '@nestjs/swagger';
 import { AddressDocument } from '@shared/address/schemas/address.schema';
+import { Gender } from '@shared/enums';
 import { IsDate, IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class CreatePatientDto {

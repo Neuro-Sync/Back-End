@@ -1,3 +1,4 @@
+import { CompanionModule } from '@modules/companions/companion/companion.module';
 import { Module } from '@nestjs/common';
 import { MailerModule } from '@shared/mailer/mailer.module';
 import { ImageModule } from '@shared/media/media.module';
@@ -9,7 +10,15 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
 @Module({
-	imports: [PatientModule, TokenModule, AuthSessionModule, OtpModule, MailerModule, ImageModule],
+	imports: [
+		PatientModule,
+		CompanionModule,
+		TokenModule,
+		AuthSessionModule,
+		OtpModule,
+		MailerModule,
+		ImageModule,
+	],
 	providers: [AuthService],
 	controllers: [AuthController],
 })
