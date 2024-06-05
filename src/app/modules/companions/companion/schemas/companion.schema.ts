@@ -1,3 +1,4 @@
+import { PatientDocument } from '@modules/patients/patient/schema/patient.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AddressDocument } from '@shared/address/schemas/address.schema';
 import { Gender } from '@shared/enums';
@@ -65,11 +66,14 @@ export class Companion {
 	@Prop({ type: String, enum: Object.values(Gender) })
 	gender?: Gender;
 
-	async comparePassword(candidatePassword: string): Promise<boolean> {
-		const [storedHash, salt] = this.password.split('.');
-		const hash = (await scrypt(candidatePassword, salt, 32)) as Buffer;
-		if (storedHash !== hash.toString('hex')) return false;
-	}
+	@Prop({ type: Boolean })
+	isLinked?: boolean;
+
+	@Prop({
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Patient',
+	})
+	patient: PatientDocument;
 }
 
 export const CompanionSchema = SchemaFactory.createForClass(Companion);

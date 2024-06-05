@@ -1,15 +1,31 @@
-import { Body, Controller, HttpCode, HttpStatus, Logger, Param, Patch, Post } from '@nestjs/common';
+import { CompanionDocument } from '@modules/companions/companion/schemas';
+import { PatientDocument } from '@modules/patients/patient/schema/patient.schema';
+import {
+	Body,
+	Controller,
+	Get,
+	HttpCode,
+	HttpStatus,
+	Logger,
+	Param,
+	Patch,
+	Post,
+	Req,
+	UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from '@shared/decorators';
+import { AuthGuard } from '@shared/guards/auth.guard';
 import { AuthService } from './auth.service';
-import { CompanionSignupDto } from './dtos';
+import { CompanionSignupDto, LoginUserDto } from './dtos';
 import { VerifyUserDto } from './dtos/signup-users.dto';
 
 @Controller('auth')
 export class AuthController {
 	private readonly logger = new Logger(AuthController.name);
 	constructor(
-		private configService: ConfigService,
+		private config: ConfigService,
 		private authService: AuthService,
 	) {}
 
@@ -35,6 +51,49 @@ export class AuthController {
 	})
 	async companionSignup(@Body() companionSignupDto: CompanionSignupDto): Promise<unknown> {
 		return await this.authService.companionSignup(companionSignupDto);
+	}
+
+	@Post('companions/login')
+	@HttpCode(HttpStatus.CREATED)
+	@ApiTags('Auth')
+	@ApiOperation({ summary: 'Companion Login' })
+	@ApiCreatedResponse({
+		description: 'Companion successfully LoggedIn.',
+	})
+	async companionLogin(@Body() companionLoginDto: LoginUserDto): Promise<unknown> {
+		return await this.authService.companionLogin(companionLoginDto);
+	}
+
+	@UseGuards(AuthGuard)
+	@Get('patient-link')
+	@HttpCode(HttpStatus.CREATED)
+	@ApiTags('Auth')
+	@ApiOperation({ summary: 'Companion Linkage' })
+	@ApiCreatedResponse({
+		description: 'Companion successfully Linked.',
+	})
+	async companionLinkage(
+		@Req() req: Request,
+		@CurrentUser() companion: CompanionDocument,
+	): Promise<unknown> {
+		const { url } = req;
+		this.logger.debug(`url: ${url}`);
+
+		const hash = url.split('/patient-link/').pop();
+		return await this.authService.companionLinkage(companion, hash);
+	}
+
+	//!: The link returned will be converted to a QR code in the client side (Mobile App)
+	@UseGuards(AuthGuard)
+	@Patch('patient-link')
+	@HttpCode(HttpStatus.CREATED)
+	@ApiTags('Auth')
+	@ApiOperation({ summary: 'Patient Linkage' })
+	@ApiCreatedResponse({
+		description: 'Patient successfully Created A Link.',
+	})
+	async patientLinkage(@CurrentUser() patient: PatientDocument): Promise<unknown> {
+		return await this.authService.patientLinkage(patient);
 	}
 
 	@Patch('Patient/:id')
