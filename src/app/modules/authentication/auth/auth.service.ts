@@ -13,7 +13,7 @@ import { currentUser } from '@shared/types/current-user.type';
 import * as crypto from 'crypto';
 import { AuthSessionService } from '../auth-session/auth-session.service';
 import { AuthSessionStatus } from '../auth-session/enums';
-import { CompanionSignupDto, LoginUserDto, PatientLinkageDto } from './dtos';
+import { CompanionSignupDto, LoginUserDto, PatientLinkageDto, PatientOnboardingDto } from './dtos';
 @Injectable()
 export class AuthService {
 	private logger = new Logger(AuthService.name);
@@ -181,6 +181,16 @@ export class AuthService {
 
 		const link = `${this.config.get<string>('app.serverUrl')}/auth/patient-link/${hash}`;
 		return { link };
+	}
+
+	async patientOnboarding(patientOnboardingDto: PatientOnboardingDto): Promise<unknown> {
+		await this.patientRepository.create({ ...patientOnboardingDto });
+		this.otpService.createAndSendOtp(
+			patientOnboardingDto.email,
+			OtpTypes.Verify_Account,
+			UserType.PATIENT,
+		);
+		return { message: 'patient onboarding done successfully' };
 	}
 
 	// async login(email: string, password: string): Promise<object> {
