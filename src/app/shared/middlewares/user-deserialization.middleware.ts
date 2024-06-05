@@ -7,7 +7,7 @@ import { TokenService } from './../token/token.service';
 export class userDeserializationMiddleware implements NestMiddleware {
 	constructor(private readonly tokenService: TokenService) {}
 
-	async use(req: Request, res: Response, next: NextFunction) {
+	async use(req: Request, res: Response, next: NextFunction): Promise<void> {
 		const accessToken = _.get(req, 'headers.authorization', '').replace(/^Bearer\s/, '');
 		const refreshToken = _.get(req, 'headers.x-refresh', '');
 

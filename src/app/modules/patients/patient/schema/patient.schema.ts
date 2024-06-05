@@ -1,3 +1,4 @@
+import { CompanionDocument } from '@modules/companions/companion/schemas';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { AddressDocument } from '@shared/address/schemas/address.schema';
 import { Gender } from '@shared/enums';
@@ -60,6 +61,15 @@ export class Patient {
 
 	@Prop({ type: String, enum: Object.values(Gender) })
 	gender?: Gender;
+
+	@Prop({ type: Boolean })
+	isLinked?: boolean;
+
+	@Prop({
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Companion',
+	})
+	companion: CompanionDocument;
 }
 
 export const PatientSchema = SchemaFactory.createForClass(Patient);

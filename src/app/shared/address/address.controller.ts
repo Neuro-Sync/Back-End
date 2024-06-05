@@ -12,7 +12,7 @@ import {
 	UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CurrentUser } from '@shared/decorators/current-user..decorator';
+import { CurrentUser } from '@shared/decorators/current-user.decorator';
 import { AuthGuard } from '@shared/guards/auth.guard';
 import { OptionsObjectDto } from '@shared/options-object/dtos';
 import { AddressService } from './address.service';

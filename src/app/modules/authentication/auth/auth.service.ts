@@ -1,25 +1,28 @@
 import { CompanionRepository } from '@modules/companions/companion/repositories';
 import { Companion, CompanionDocument } from '@modules/companions/companion/schemas';
+import { PatientRepository } from '@modules/patients/patient/repositories';
+import { PatientDocument } from '@modules/patients/patient/schema/patient.schema';
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { UserType } from '@shared/enums';
-import { MailerService } from '@shared/mailer/mailer.service';
 import { ImageService } from '@shared/media/image.service';
 import { OtpTypes } from '@shared/otp/enums';
 import { OtpService } from '@shared/otp/otp.service';
 import { TokenService } from '@shared/token/token.service';
 import { currentUser } from '@shared/types/current-user.type';
+import * as crypto from 'crypto';
 import { AuthSessionService } from '../auth-session/auth-session.service';
 import { AuthSessionStatus } from '../auth-session/enums';
-import { CompanionSignupDto } from './dtos';
-
+import { CompanionSignupDto, LoginUserDto, PatientLinkageDto } from './dtos';
 @Injectable()
 export class AuthService {
 	private logger = new Logger(AuthService.name);
 	constructor(
+		private readonly config: ConfigService,
 		private readonly authSessionService: AuthSessionService,
-		// private readonly patientRepository: PatientRepository,
+		private readonly patientRepository: PatientRepository,
 		private readonly companionRepository: CompanionRepository,
-		private readonly mailerService: MailerService,
+		// private readonly mailerService: MailerService,
 		private readonly tokenService: TokenService,
 		private readonly imageService: ImageService,
 		private readonly otpService: OtpService,
@@ -113,18 +116,16 @@ export class AuthService {
 	// 	}
 	// }
 
-	async companionLogin(
-		email: string,
-		password: string,
-	): Promise<{
+	async companionLogin(loginDto: LoginUserDto): Promise<{
 		companion: CompanionDocument;
 		accessToken: string;
 		refreshToken: string;
 	}> {
+		const { email, password } = loginDto;
 		const companion = await this.companionRepository.findOne({ email });
 		if (!companion) throw new NotFoundException('user not found');
 
-		if (!(await companion.comparePassword(password)))
+		if (!(await this.companionRepository.comparePassword(companion, password)))
 			throw new BadRequestException('invalid credentials');
 
 		const session = await this.authSessionService.createSession({
@@ -147,6 +148,41 @@ export class AuthService {
 
 		return { companion, accessToken, refreshToken };
 	}
+
+	async companionLinkage(companion: CompanionDocument, hash: string): Promise<{ message: string }> {
+		this.logger.debug(hash);
+		const decipher = crypto.createDecipheriv(
+			'sha256',
+			this.config.get<string>('app.linkageSecret'),
+			this.config.get<string>('app.linkageInitVector'),
+		);
+		const patientId = decipher.update(hash, 'hex', 'utf8');
+
+		const patient = await this.patientRepository.findById(patientId);
+		if (!patient) throw new NotFoundException('patient not found');
+		patient.companion = companion.id;
+		patient.isLinked = true;
+		try {
+			await patient.save();
+			return { message: 'patient linked successfully' };
+		} catch (error) {
+			throw new BadRequestException(error.message);
+		}
+	}
+
+	async patientLinkage(patient: PatientDocument): Promise<PatientLinkageDto> {
+		const cipher = crypto.createCipheriv(
+			'sha256',
+			this.config.get<string>('app.linkageSecret'),
+			this.config.get<string>('app.linkageInitVector'),
+		);
+		const hash = cipher.update(patient.id, 'utf8', 'hex');
+		this.logger.debug(hash);
+
+		const link = `${this.config.get<string>('app.serverUrl')}/auth/patient-link/${hash}`;
+		return { link };
+	}
+
 	// async login(email: string, password: string): Promise<object> {
 	// 	const [user] = await this.PatientService.findPatients({ email });
 	// 	if (!user) throw new NotFoundException('user not found');
@@ -183,7 +219,12 @@ export class AuthService {
 		const companion = await this.companionRepository.findById(id);
 		if (!companion) throw new NotFoundException('companion not found');
 
-		const isVerified = await this.otpService.verifyOTP(id, dto.otp, OtpTypes.Verify_Account);
+		const isVerified = await this.otpService.verifyOTP(
+			companion.email,
+			dto.otp,
+			OtpTypes.Verify_Account,
+			UserType.COMPANION,
+		);
 		if (!isVerified) throw new BadRequestException('invalid otp');
 
 		companion.isVerified = true;
