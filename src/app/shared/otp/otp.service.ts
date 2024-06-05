@@ -1,3 +1,5 @@
+import { CompanionRepository } from '@modules/companions/companion/repositories';
+import { PatientRepository } from '@modules/patients/patient/repositories';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserType } from '@shared/enums';
@@ -12,6 +14,8 @@ export class OtpService {
 	constructor(
 		@InjectModel(Otp.name) private OtpModel: Model<Otp>,
 		private readonly mailerServer: MailerService,
+		private readonly patientRepository: PatientRepository,
+		private readonly companionRepository: CompanionRepository,
 	) {}
 
 	private async createOtp(userId: string, OtpType: OtpTypes): Promise<string> {
@@ -30,10 +34,16 @@ export class OtpService {
 		return Otp.toString();
 	}
 
-	async verifyOTP(userId: string, OTP: string, OtpType: OtpTypes): Promise<boolean> {
+	async verifyOTP(
+		userId: string,
+		OTP: string,
+		OtpType: OtpTypes,
+		ownerType: UserType,
+	): Promise<boolean> {
 		const storedOtp = await this.OtpModel.findOne({
 			owner: userId,
 			OtpType: OtpType,
+			ownerType,
 			expiresAt: { $gt: new Date(Date.now()) },
 		});
 		if (!storedOtp) return false;

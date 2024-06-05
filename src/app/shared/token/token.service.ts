@@ -1,5 +1,6 @@
 import { AuthSessionService } from '@modules/authentication/auth-session/auth-session.service';
-import { PatientService } from '@modules/patients/patient/patient.service';
+import { CompanionRepository } from '@modules/companions/companion/repositories';
+import { PatientRepository } from '@modules/patients/patient/repositories';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
@@ -14,7 +15,8 @@ export class TokenService {
 	constructor(
 		@InjectModel(Token.name) private TokenModel: Model<Token>,
 		private readonly jwtService: JwtService,
-		private readonly patientService: PatientService,
+		private readonly patientRepository: PatientRepository,
+		private readonly companionRepository: CompanionRepository,
 		private readonly authSessionService: AuthSessionService,
 	) {}
 
@@ -90,7 +92,7 @@ export class TokenService {
 		const session = await this.authSessionService.findSessionById(_.get(decoded, 'session'));
 		if (!session || session.status == 'inactive' || session.status == 'expired') return false;
 
-		const [patient] = await this.patientService.findPatients({ id: session.user });
+		const patient = await this.patientRepository.findOne({ id: session.user });
 		if (!patient) return false;
 
 		const accessToken = this.signJWT(

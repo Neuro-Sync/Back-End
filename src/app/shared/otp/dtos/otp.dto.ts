@@ -16,16 +16,16 @@ export class createOTPDto {
 		enum: OtpTypes,
 	})
 	@IsString()
-	OtpType: OtpTypes;
+	otpType: OtpTypes;
 }
 
 export class verifyOTPDto {
 	@ApiProperty({
 		type: String,
-		example: '6635f3eaedc264ea5c062afe',
+		example: 'mohammed.medhat2121@gmail.com',
 	})
 	@IsString()
-	userId: string;
+	email: string;
 
 	@ApiProperty({
 		type: OtpTypes,
@@ -33,5 +33,5 @@ export class verifyOTPDto {
 		enum: OtpTypes,
 	})
 	@IsString()
-	OtpType: OtpTypes;
+	otpType: OtpTypes;
 }
