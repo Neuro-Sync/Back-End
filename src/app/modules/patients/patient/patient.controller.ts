@@ -1,28 +1,17 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Controller, Get, Logger } from '@nestjs/common';
+import { CurrentUser } from '@shared/decorators';
+import { PatientDocument } from './schema/patient.schema';
 
 @Controller('patients')
 export class PatientController {
 	private logger = new Logger(PatientController.name);
 	constructor() {}
-	async findPatients(query) {
-		return [];
-	}
-	async createPatient() {
-		return {};
-	}
-	async updatePatient() {
-		return {};
-	}
-	async deletePatient() {
-		return {};
-	}
-	async verifyPatient() {
-		return {};
-	}
-	async suspendPatient() {
-		return {};
-	}
-	async unsuspendPatient() {
-		return {};
+
+	@Get('me')
+	async getPatient(@CurrentUser() patient: PatientDocument): Promise<unknown> {
+		return {
+			message: 'Patient found!',
+			data: patient,
+		};
 	}
 }
