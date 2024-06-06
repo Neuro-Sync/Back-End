@@ -1,14 +1,10 @@
 import { CompanionDocument } from '@modules/companions/companion/schemas';
+import { MapDocument } from '@modules/map/schemas/map.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { AddressDocument } from '@shared/address/schemas/address.schema';
 import { Gender } from '@shared/enums';
 import { ImageDocument } from '@shared/media/schemas/image.schema';
-import { scrypt as _scrypt, randomBytes } from 'crypto';
 import * as mongoose from 'mongoose';
 import { HydratedDocument } from 'mongoose';
-import { promisify } from 'util';
-
-const scrypt = promisify(_scrypt);
 
 export type PatientDocument = HydratedDocument<Patient>;
 
@@ -24,11 +20,8 @@ export class Patient {
 	@Prop({ type: String, required: true, unique: true })
 	email: string;
 
-	@Prop({ type: String, required: true, unique: true })
-	phone: string;
-
-	@Prop({ type: String, required: true })
-	password: string;
+	@Prop({ type: String, unique: true })
+	phone?: string;
 
 	@Prop({ type: Boolean, default: false })
 	isVerified?: boolean;
@@ -44,20 +37,20 @@ export class Patient {
 
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Address',
+		ref: 'Map',
 		autopopulate: true,
 	})
-	address?: AddressDocument;
+	map?: MapDocument;
 
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Image',
 		autopopulate: true,
 	})
-	profilePicture: ImageDocument;
+	profilePicture?: ImageDocument;
 
 	@Prop({ type: Date })
-	dateOfBirth?: Date;
+	dateOfBirth: Date;
 
 	@Prop({ type: String, enum: Object.values(Gender) })
 	gender?: Gender;
@@ -69,17 +62,10 @@ export class Patient {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Companion',
 	})
-	companion: CompanionDocument;
+	companion?: CompanionDocument;
+
+	@Prop({ type: String, default: 'patient' })
+	role?: string;
 }
 
 export const PatientSchema = SchemaFactory.createForClass(Patient);
-
-PatientSchema.pre('save', async function (next) {
-	if (!this.isModified('password')) return next();
-	const salt = randomBytes(8).toString('hex');
-	const hash = (await scrypt(this.password, salt, 32)) as Buffer;
-	this.password = `${hash.toString('hex')}.${salt}`;
-	this.passwordChangedAt = new Date(Date.now() - 1000);
-
-	next();
-});

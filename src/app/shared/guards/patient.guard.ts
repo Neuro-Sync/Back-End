@@ -1,8 +1,8 @@
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 
-export class AdminGuard implements CanActivate {
+export class PatientGuard implements CanActivate {
 	canActivate(context: ExecutionContext): boolean {
 		const response = context.switchToHttp().getResponse();
-		return response.locals.user.role === 'admin';
+		return response.locals.user.role === 'patient';
 	}
 }

@@ -10,16 +10,15 @@ import {
 	Param,
 	Patch,
 	Post,
-	Req,
 	UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '@shared/decorators';
 import { AuthGuard } from '@shared/guards/auth.guard';
+import { PatientGuard } from '@shared/guards/patient.guard';
 import { AuthService } from './auth.service';
-import { CompanionSignupDto, LoginUserDto } from './dtos';
-import { VerifyUserDto } from './dtos/signup-users.dto';
+import { CompanionSignupDto, LoginUserDto, PatientOnboardingDto } from './dtos';
 
 @Controller('auth')
 export class AuthController {
@@ -28,19 +27,6 @@ export class AuthController {
 		private config: ConfigService,
 		private authService: AuthService,
 	) {}
-
-	// @Post('patients/signup')
-	// @Serialize(GetPatientSignupDtoWithTokens)
-	// @HttpCode(HttpStatus.CREATED)
-	// @ApiTags('Auth')
-	// @ApiOperation({ summary: 'Patient Signup' })
-	// @ApiCreatedResponse({
-	// 	type: GetPatientSignupDtoWithTokens,
-	// 	description: 'patient successfully registered.',
-	// })
-	// async PatientSignup(@Body() dto: CreatePatientDto): Promise<object> {
-	// 	// return await this.authService.companionLogin(dto);
-	// }
 
 	@Post('companions/signup')
 	@HttpCode(HttpStatus.CREATED)
@@ -65,7 +51,7 @@ export class AuthController {
 	}
 
 	@UseGuards(AuthGuard)
-	@Get('patient-link')
+	@Get('patient-link/:hash')
 	@HttpCode(HttpStatus.CREATED)
 	@ApiTags('Auth')
 	@ApiOperation({ summary: 'Companion Linkage' })
@@ -73,18 +59,15 @@ export class AuthController {
 		description: 'Companion successfully Linked.',
 	})
 	async companionLinkage(
-		@Req() req: Request,
+		@Param('hash') hash: string,
 		@CurrentUser() companion: CompanionDocument,
 	): Promise<unknown> {
-		const { url } = req;
-		this.logger.debug(`url: ${url}`);
-
-		const hash = url.split('/patient-link/').pop();
 		return await this.authService.companionLinkage(companion, hash);
 	}
 
 	//!: The link returned will be converted to a QR code in the client side (Mobile App)
 	@UseGuards(AuthGuard)
+	@UseGuards(PatientGuard)
 	@Patch('patient-link')
 	@HttpCode(HttpStatus.CREATED)
 	@ApiTags('Auth')
@@ -96,24 +79,14 @@ export class AuthController {
 		return await this.authService.patientLinkage(patient);
 	}
 
-	@Patch('Patient/:id')
+	@Post('patients/onboarding')
 	@HttpCode(HttpStatus.OK)
 	@ApiTags('Auth')
-	@ApiOperation({ summary: 'Verify Account' })
-	@ApiCreatedResponse({ description: 'account successfully verified' })
-	async verifyUser(@Body() dto: VerifyUserDto, @Param('id') id: string): Promise<object> {
-		return await this.authService.verifyUser(dto, id);
+	@ApiOperation({ summary: 'User Login' })
+	@ApiCreatedResponse({ description: 'patient onboarding done successfully' })
+	async patientOnboarding(@Body() patientOnboardingDto: PatientOnboardingDto): Promise<unknown> {
+		return await this.authService.patientOnboarding(patientOnboardingDto);
 	}
-
-	// @Post('login')
-	// @Serialize(LoggedInDTO)
-	// @HttpCode(HttpStatus.OK)
-	// @ApiTags('Auth')
-	// @ApiOperation({ summary: 'User Login' })
-	// @ApiCreatedResponse({ type: LoggedInDTO, description: 'user logged in successfully' })
-	// async login(@Body() { email, password }: LoginUserDto): Promise<object> {
-	// 	return await this.authService.login(email, password);
-	// }
 
 	// @Delete('logout')
 	// @UseGuards(AuthGuard)
