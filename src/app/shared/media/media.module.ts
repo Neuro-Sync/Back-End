@@ -3,7 +3,16 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { DocumentService } from './document.service';
 import { ImageService } from './image.service';
 import { MediaService } from './media.service';
-import { ImageSchema, Media, MediaSchema, Pdf, PdfSchema, Video, VideoSchema } from './schemas';
+import {
+	Image,
+	ImageSchema,
+	Media,
+	MediaSchema,
+	Pdf,
+	PdfSchema,
+	Video,
+	VideoSchema,
+} from './schemas';
 import { VideoService } from './video.service';
 
 @Global()
