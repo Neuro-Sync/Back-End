@@ -3,15 +3,15 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { CompanionDocument } from '@modules/companions/companion/schemas';
 import { PatientDocument } from '@modules/patients/patient/schema/patient.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { AddressType } from '../enums';
+import { MapType } from '../enums';
 
-export type AddressDocument = HydratedDocument<Address>;
+export type MapDocument = HydratedDocument<Map>;
 
 @Schema({
 	timestamps: true,
 	versionKey: false,
 })
-export class Address {
+export class Map {
 	@Prop({ type: mongoose.Schema.Types.ObjectId, required: true })
 	owner: PatientDocument | CompanionDocument;
 
@@ -21,8 +21,8 @@ export class Address {
 	@Prop({ type: String })
 	longitude: string;
 
-	@Prop({ type: String, enum: Object.values(AddressType), required: true })
-	addressType: string;
+	@Prop({ type: String, enum: Object.values(MapType), required: true })
+	mapType: string;
 }
 
-export const AddressSchema = SchemaFactory.createForClass(Address);
+export const MapSchema = SchemaFactory.createForClass(Map);

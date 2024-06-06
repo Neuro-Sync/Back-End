@@ -1,4 +1,4 @@
-export enum AddressType {
+export enum MapType {
 	PIN = 'pin',
 	HOME = 'home',
 	WORK = 'work',
