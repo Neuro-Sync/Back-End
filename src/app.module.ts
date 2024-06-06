@@ -1,13 +1,14 @@
 import { AuthModule } from '@modules/authentication/auth/auth.module';
+import { EntertainmentModule } from '@modules/entertainment/entertainment.module';
+import { MapModule } from '@modules/map/map.module';
 import { PatientModule } from '@modules/patients/patient/patient.module';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AddressModule } from '@shared/address/address.module';
 import { CloudinaryModule } from '@shared/cloudinary/cloudinary.module';
 import Configs from '@shared/config';
 import { MailerModule } from '@shared/mailer/mailer.module';
-import { ImageModule } from '@shared/media/media.module';
+import { MediaModule } from '@shared/media/media.module';
 import { UserDeserializationMiddleware } from '@shared/middlewares/user-deserialization.middleware';
 import { OtpModule } from '@shared/otp/otp.module';
 import { PaymentModule } from '@shared/payment/payment.module';
@@ -42,9 +43,10 @@ import { TokenModule } from '@shared/token/token.module';
 		TokenModule,
 		PatientModule,
 		PaymentModule,
-		ImageModule,
+		MediaModule,
+		EntertainmentModule,
 		CloudinaryModule,
-		AddressModule,
+		MapModule,
 		OtpModule,
 		MailerModule,
 	],

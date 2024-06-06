@@ -1,6 +1,6 @@
 import { CompanionDocument } from '@modules/companions/companion/schemas';
+import { MapDocument } from '@modules/map/schemas/map.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { AddressDocument } from '@shared/address/schemas/address.schema';
 import { Gender } from '@shared/enums';
 import { ImageDocument } from '@shared/media/schemas/image.schema';
 import * as mongoose from 'mongoose';
@@ -37,10 +37,10 @@ export class Patient {
 
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Address',
+		ref: 'Map',
 		autopopulate: true,
 	})
-	address?: AddressDocument;
+	map?: MapDocument;
 
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,

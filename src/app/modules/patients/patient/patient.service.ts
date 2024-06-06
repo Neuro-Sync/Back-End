@@ -1,4 +1,4 @@
-import { CreatePatientDto } from '@modules/authentication/auth/dtos/signup-users.dto';
+import { CreatePatientDto } from '@modules/authentication/auth/dtos';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { OptionsObjectDto } from '@shared/options-object/dtos';
@@ -16,7 +16,12 @@ export class PatientService {
 	}
 
 	async findPatients(query: unknown): Promise<PatientDocument[]> {
-		return await this.patientModel.find(query);
+		return await this.patientModel.find(query || {});
+	}
+
+	async findPatient(query: unknown): Promise<PatientDocument> {
+		this.logger.debug(`findPatient query:${JSON.stringify(await this.patientModel.find({}))}`);
+		return await this.patientModel.findOne(query || {});
 	}
 
 	async createPatient(dto: CreatePatientDto): Promise<PatientDocument> {

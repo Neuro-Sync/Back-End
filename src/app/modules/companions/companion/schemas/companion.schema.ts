@@ -1,6 +1,6 @@
+import { MapDocument } from '@modules/map/schemas/map.schema';
 import { PatientDocument } from '@modules/patients/patient/schema/patient.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { AddressDocument } from '@shared/address/schemas/address.schema';
 import { Gender } from '@shared/enums';
 import { ImageDocument } from '@shared/media/schemas/image.schema';
 import { scrypt as _scrypt, randomBytes } from 'crypto';
@@ -48,10 +48,10 @@ export class Companion {
 
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Address',
+		ref: 'Map',
 		autopopulate: true,
 	})
-	address?: AddressDocument;
+	address?: MapDocument;
 
 	@Prop({
 		type: mongoose.Schema.Types.ObjectId,
