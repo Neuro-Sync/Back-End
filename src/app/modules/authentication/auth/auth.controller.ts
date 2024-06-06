@@ -10,7 +10,6 @@ import {
 	Param,
 	Patch,
 	Post,
-	Req,
 	UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -60,7 +59,6 @@ export class AuthController {
 		description: 'Companion successfully Linked.',
 	})
 	async companionLinkage(
-		@Req() req: Request,
 		@Param('hash') hash: string,
 		@CurrentUser() companion: CompanionDocument,
 	): Promise<unknown> {

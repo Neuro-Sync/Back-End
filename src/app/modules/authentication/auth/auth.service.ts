@@ -162,7 +162,10 @@ export class AuthService {
 		if (!patient) throw new NotFoundException('patient not found');
 		patient.companion = companion.id;
 		patient.isLinked = true;
+		companion.patient = patient.id;
+		companion.isLinked = true;
 		try {
+			await companion.save();
 			await patient.save();
 			return { message: 'patient linked successfully' };
 		} catch (error) {
@@ -197,11 +200,7 @@ export class AuthService {
 			throw new BadRequestException(error.message);
 		}
 
-		this.otpService.createAndSendOtp(
-			patientOnboardingDto.email,
-			OtpTypes.Verify_Account,
-			UserType.PATIENT,
-		);
+		this.otpService.createAndSendOtp(patient.id, OtpTypes.Verify_Account, UserType.PATIENT);
 
 		const session = await this.authSessionService.createSession({
 			user: patient.id,
