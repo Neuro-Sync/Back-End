@@ -1,4 +1,4 @@
-export enum MimeType {
+export enum MimeImageType {
 	APNG = 'apng',
 	AVIF = 'avif',
 	GIF = 'gif',

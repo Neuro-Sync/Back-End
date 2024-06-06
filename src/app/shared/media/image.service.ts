@@ -4,14 +4,12 @@ import { Model } from 'mongoose';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { FileType } from '../types';
 import { Image, ImageDocument } from './schemas/image.schema';
-import { Pdf, PdfDocument } from './schemas/pdf.schema';
 
 @Injectable()
 export class ImageService {
 	private logger = new Logger(ImageService.name);
 	constructor(
 		@InjectModel(Image.name) private imageModel: Model<Image>,
-		@InjectModel(Pdf.name) private pdfModel: Model<Pdf>,
 		private cloudinaryService: CloudinaryService,
 	) {}
 
@@ -25,15 +23,8 @@ export class ImageService {
 	// 		}
 	// 	}
 
-	async uploadSinglePdf(file: FileType): Promise<PdfDocument> {
-		const result = await this.cloudinaryService.uploadFile(file);
-		const pdf: PdfDocument = await this.pdfModel.create({
-			pdfUrl: result.secure_url,
-			cloudinaryId: result.public_id,
-		});
-		this.logger.debug('pdf', pdf.id);
-
-		return pdf;
+	async createImage(dto: unknown): Promise<ImageDocument> {
+		return await this.imageModel.create(dto);
 	}
 
 	//TODO: make a preview for the image not just upload it
@@ -50,11 +41,9 @@ export class ImageService {
 		return image;
 	}
 
-	async deleteImage(imageId: string): Promise<ImageDocument> {
-		const cloudinaryId = (await this.imageModel.findById(imageId)).cloudinaryId;
-		// FIXME the following code delete uploaded images (florist work) from cloudinary
-		await this.cloudinaryService.deleteFile(cloudinaryId);
-		return await this.imageModel.findByIdAndDelete(imageId);
+	async deleteImage(image: ImageDocument): Promise<ImageDocument> {
+		await this.cloudinaryService.deleteFile(image.cloudinaryId);
+		return await this.imageModel.findByIdAndDelete(image.id);
 	}
 
 	async getImagesById(imageId: string): Promise<ImageDocument> {

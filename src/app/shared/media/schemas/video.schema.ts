@@ -1,23 +1,23 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { MimeImageType } from '../enums';
+import { MimeVideoType } from '../enums';
 
-export type ImageDocument = HydratedDocument<Image>;
+export type VideoDocument = HydratedDocument<Video>;
 
 @Schema({
 	timestamps: true,
 	versionKey: false,
 })
-export class Image {
+export class Video {
 	@Prop({ type: String, required: true })
-	imageUrl: string;
+	VideoUrl: string;
 
 	@Prop({ type: String, required: true })
 	previewUrl: string;
 
 	@Prop({
 		type: String,
-		enum: Object.values(MimeImageType).map((value) => `image/${value}`),
+		enum: Object.values({ MimeVideoType }).map((value) => `Video/${value}`),
 		required: true,
 	})
 	mime: string;
@@ -26,4 +26,4 @@ export class Image {
 	cloudinaryId: string;
 }
 
-export const ImageSchema = SchemaFactory.createForClass(Image);
+export const VideoSchema = SchemaFactory.createForClass(Video);
