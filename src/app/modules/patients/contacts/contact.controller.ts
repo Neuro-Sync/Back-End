@@ -26,7 +26,7 @@ import { Contact, ContactDocument } from './schemas/contact.schema';
 @UseGuards(AuthGuard)
 export class ContactController {
 	private logger = new Logger(ContactController.name);
-	constructor(private ContactService: ContactService) {}
+	constructor(private contactService: ContactService) {}
 
 	@Get()
 	@ApiOperation({ summary: 'get all Contacts' })
@@ -37,7 +37,7 @@ export class ContactController {
 		optionsObjectDto.filter.concat(`patientId ${patient.id}`);
 		return {
 			message: 'success',
-			data: await this.ContactService.getContacts(optionsObjectDto),
+			data: await this.contactService.getContacts(optionsObjectDto),
 		};
 	}
 
@@ -47,7 +47,7 @@ export class ContactController {
 	async getContact(@Param('ContactId') ContactId: string): Promise<IResponse<Contact>> {
 		return {
 			message: 'success',
-			data: await this.ContactService.getContact(ContactId),
+			data: await this.contactService.getContact(ContactId),
 		};
 	}
 
@@ -60,7 +60,7 @@ export class ContactController {
 	): Promise<IResponse<Contact>> {
 		return {
 			message: 'success',
-			data: await this.ContactService.createContact(patient, createContactDto),
+			data: await this.contactService.createContact(patient, createContactDto),
 		};
 	}
 
@@ -73,7 +73,7 @@ export class ContactController {
 	): Promise<IResponse<Contact>> {
 		return {
 			message: 'success',
-			data: await this.ContactService.updateContact(ContactId, Contact),
+			data: await this.contactService.updateContact(ContactId, Contact),
 		};
 	}
 
@@ -83,7 +83,7 @@ export class ContactController {
 	async deleteContact(@Param('ContactId') ContactId: string): Promise<IResponse<Contact>> {
 		return {
 			message: 'success',
-			data: await this.ContactService.deleteContact(ContactId),
+			data: await this.contactService.deleteContact(ContactId),
 		};
 	}
 }
