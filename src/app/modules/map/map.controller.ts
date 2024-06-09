@@ -73,12 +73,12 @@ export class MapController {
 	}
 
 	@Get()
-	@ApiOperation({ summary: 'get mapes' })
-	async getMapes(
+	@ApiOperation({ summary: 'get maps' })
+	async getMaps(
 		@CurrentUser() user: PatientDocument,
 		@Query() query: OptionsObjectDto,
 	): Promise<MapDocument[]> {
-		return await this.mapService.getMapes(query, user);
+		return await this.mapService.getMaps(query, user);
 	}
 
 	@Get('/:mapId')

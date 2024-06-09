@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { FileType } from '../types';
-import { Pdf, PdfDocument } from './schemas/pdf.schema';
+import { Pdf, PdfDocument } from './schemas';
 
 @Injectable()
 export class DocumentService {

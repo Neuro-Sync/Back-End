@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { FileType } from '../types';
-import { Video, VideoDocument } from './schemas/Video.schema';
+import { Video, VideoDocument } from './schemas';
 
 @Injectable()
 export class VideoService {

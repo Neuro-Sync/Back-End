@@ -5,10 +5,7 @@ import { Model } from 'mongoose';
 import { DocumentService } from './document.service';
 import { MediaType } from './enums';
 import { ImageService } from './image.service';
-import { VideoDocument } from './schemas/Video.schema';
-import { ImageDocument } from './schemas/image.schema';
-import { Media, MediaDocument } from './schemas/media.schema';
-import { PdfDocument } from './schemas/pdf.schema';
+import { ImageDocument, Media, MediaDocument, PdfDocument, VideoDocument } from './schemas';
 import { VideoService } from './video.service';
 
 @Injectable()

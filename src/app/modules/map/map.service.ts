@@ -14,10 +14,7 @@ export class MapService {
 	private logger = new Logger(MapService.name);
 	constructor(@InjectModel(Map.name) private mapModel: Model<Map>) {}
 
-	async getMapes(
-		optionsObjectDto: OptionsObjectDto,
-		user: PatientDocument,
-	): Promise<MapDocument[]> {
+	async getMaps(optionsObjectDto: OptionsObjectDto, user: PatientDocument): Promise<MapDocument[]> {
 		optionsObjectDto.filter.concat(`,owner=${user.id}`);
 		const maps = await new OptionsObject<Map>(this.mapModel).getResult(optionsObjectDto);
 
