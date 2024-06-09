@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { MediaType } from '../enums';
-import { VideoDocument } from './Video.schema';
 import { ImageDocument } from './image.schema';
 import { PdfDocument } from './pdf.schema';
+import { VideoDocument } from './video.schema';
 
 export type MediaDocument = HydratedDocument<Media>;
 

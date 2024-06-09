@@ -17,7 +17,7 @@ import { AuthGuard } from '@shared/guards/auth.guard';
 import { IResponse } from '@shared/interfaces';
 import { OptionsObjectDto } from '@shared/options-object/dtos';
 import { PatientDocument } from '../patient/schema/patient.schema';
-import { ContactService } from './Contact.service';
+import { ContactService } from './contact.service';
 import { CreateContactDto } from './dtos';
 import { Contact, ContactDocument } from './schemas/contact.schema';
 
