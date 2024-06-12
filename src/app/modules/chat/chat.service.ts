@@ -3,5 +3,5 @@ import { MessageRepository } from './repositories';
 
 @Injectable()
 export class ChatService {
-	constructor(private readonly messageRepository: MessageRepository) {}
+  constructor(private readonly messageRepository: MessageRepository) {}
 }
