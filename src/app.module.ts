@@ -1,4 +1,5 @@
 import { AuthModule } from '@modules/authentication/auth/auth.module';
+import { ChatModule } from '@modules/chat/chat.module';
 import { EntertainmentModule } from '@modules/entertainment/entertainment.module';
 import { MapModule } from '@modules/map/map.module';
 import { PatientModule } from '@modules/patients/patient/patient.module';
@@ -44,6 +45,7 @@ import { TokenModule } from '@shared/token/token.module';
 		PatientModule,
 		PaymentModule,
 		MediaModule,
+		ChatModule,
 		EntertainmentModule,
 		CloudinaryModule,
 		MapModule,
