@@ -223,6 +223,14 @@ export class AuthService {
     return { patient, accessToken, refreshToken };
   }
 
+  async patientSessionRefresh(patient: PatientDocument): Promise<unknown> {
+    const accessToken = await this.tokenService.signJWT({ ...patient.toJSON() }, 'access');
+
+    const refreshToken = await this.tokenService.signJWT({ ...patient.toJSON() }, 'refresh');
+
+    return { patient, accessToken, refreshToken };
+  }
+
   // async login(email: string, password: string): Promise<object> {
   // 	const [user] = await this.PatientService.findPatients({ email });
   // 	if (!user) throw new NotFoundException('user not found');

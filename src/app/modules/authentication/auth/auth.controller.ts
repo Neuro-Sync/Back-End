@@ -78,6 +78,18 @@ export class AuthController {
   async patientLinkage(@CurrentUser() patient: PatientDocument): Promise<unknown> {
     return await this.authService.patientLinkage(patient);
   }
+  @UseGuards(AuthGuard)
+  @UseGuards(PatientGuard)
+  @Get('patients/refresh')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiTags('Auth')
+  @ApiOperation({ summary: 'Patient session refresh' })
+  @ApiCreatedResponse({
+    description: 'Patient successfully refreshed his session.'
+  })
+  async patientRefresh(@CurrentUser() patient: PatientDocument): Promise<unknown> {
+    return await this.authService.patientSessionRefresh(patient);
+  }
 
   @Post('patients/onboarding')
   @HttpCode(HttpStatus.OK)
